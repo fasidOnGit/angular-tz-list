@@ -13,3 +13,17 @@ cdk-virtual-scroll-viewport {
 mat-table {
   width: 100%;
 }
+
+.table-header {
+  background: whitesmoke;
+  padding: 1.2em;
+  color: #818d9c;
+  span {
+    &:last-child {
+      padding-right: 24px;
+    }
+    &:first-child {
+      padding-left: 24px;
+    }
+  }
+}

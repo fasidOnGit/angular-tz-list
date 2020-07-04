@@ -2,6 +2,7 @@ import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {ITzTableColumn} from './tz-table/tz-table-column.interface';
 import {TQueryFuncCallback} from './tz-table/tz-table.component';
 import {TzTransactionService} from './tz-transaction.service';
+import {formatDate} from '@angular/common';
 
 /**
  * Model for Transaction.
@@ -37,17 +38,25 @@ export class AppComponent {
       {
         title: 'amount',
         label: 'Amount XTZ (USD)',
-        property: 'volume'
+        property: 'volume',
       },
       {
         title: 'date',
         label: 'Date',
-        property: 'time'
+        property: 'time',
+        valueTransformer: (value, property) => {
+          return formatDate(value[property], 'MMM d y, h::mm', 'en-US');
+        }
       },
       {
         title: 'address',
         label: 'Address',
-        property: 'sender'
+        property: 'sender',
+        valueTransformer: ((value, property) => {
+          const val = value[property] as string;
+          // Yes, we can do the same with css :after and ellipsis., But hey! I kinda chose this :)
+          return `${val.slice(0, 2)}...${val.slice(val.length - 6, val.length - 1)}`;
+        })
       }
     ];
     this.loadDataQuery = this.loadData();

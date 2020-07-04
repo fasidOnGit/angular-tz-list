@@ -6,10 +6,11 @@ import {MatTableModule} from '@angular/material/table';
 import {ObserversModule} from '@angular/cdk/observers';
 import {FlexModule} from '@angular/flex-layout';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { ValueTransformerPipe } from './value-transformer/value-transformer.pipe';
 
 
 @NgModule({
-  declarations: [TzTableComponent],
+  declarations: [TzTableComponent, ValueTransformerPipe],
   exports: [
     TzTableComponent
   ],

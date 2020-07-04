@@ -1,7 +1,7 @@
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
 import {BehaviorSubject, Observable, of, Subscription, throwError} from 'rxjs';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
-import {TQueryFuncCallback} from './tz-table.component';
+import {TQueryFuncCallback} from '../tz-table.component';
 import {catchError, distinctUntilChanged, map, mergeMap, tap} from 'rxjs/operators';
 
 /**

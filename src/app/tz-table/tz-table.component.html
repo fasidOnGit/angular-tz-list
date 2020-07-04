@@ -1,23 +1,23 @@
 <div fxLayout="column">
-  <div class="table-header" fxLayout="row">
-  <span *ngFor="let column of displayedColumns" fxFlex>
-    {{column}}
-  </span>
+  <div class="table-header" fxFlex="99%" fxLayout="row">
+    <span *ngFor="let column of columns" fxFlex>
+      {{column.label}}
+    </span>
   </div>
   <cdk-virtual-scroll-viewport fxFlex>
     <mat-table [dataSource]="dataSource">
       <mat-row [style.height.px]="itemSize" *matRowDef="let row; columns: displayedColumns"></mat-row>
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
         <mat-cell *matCellDef="let element" fxFlex>
-          <span>{{element[column.property]}}</span>
+          <span>{{!column.valueTransformer ? element[column.property]: (element | valueTransformer: column)}}</span>
         </mat-cell>
       </ng-container>
-      <ng-container matColumnDef="disclaimer">
+      <ng-container matColumnDef="loading">
         <mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length" fxFlex fxLayoutAlign="center center">
           <mat-spinner [diameter]="30"></mat-spinner>
         </mat-footer-cell>
       </ng-container>
-      <mat-footer-row *matFooterRowDef="(dataSource?.loading | async) ? ['disclaimer'] : []"></mat-footer-row>
+      <mat-footer-row *matFooterRowDef="(dataSource?.loading | async) ? ['loading'] : []"></mat-footer-row>
     </mat-table>
   </cdk-virtual-scroll-viewport>
 </div>

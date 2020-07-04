@@ -6,4 +6,5 @@ export interface ITzTableColumn {
   label: string;
   property: string;
   templateRef?: string;
+  valueTransformer?: (value: any, property: string) => any;
 }

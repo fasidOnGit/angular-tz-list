@@ -3,8 +3,8 @@ import {Observable} from 'rxjs';
 import {CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
 import {DataSource} from '@angular/cdk/collections';
 import {ITzTableColumn} from './tz-table-column.interface';
-import {DataSourceQuery} from './data-source-query';
-import {CustomVirtualScrollStrategy} from './virtual-scroll-stratergy';
+import {DataSourceQuery} from './strategy/data-source-query';
+import {CustomVirtualScrollStrategy} from './strategy/virtual-scroll-stratergy';
 
 export type TQueryFuncCallback<T> = (params: {
   limit: number, cursor: T
