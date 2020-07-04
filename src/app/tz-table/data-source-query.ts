@@ -153,7 +153,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
         }
       }),
       map(dataLoadResult => {
-        const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize) + 1;
+        const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize);
         const startItemIndex = Math.floor(dataLoadResult.viewportChange.scrollOffset / this.itemSize);
         const endItemIndex = startItemIndex + itemsInViewport;
         const slicedData = this.allData.slice(startItemIndex, endItemIndex);
@@ -174,7 +174,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @return Chunk data with its appropriate chained viewport change.
    */
   private loadDataChunk(viewportChange: IViewportChange): Observable<{viewportChange: IViewportChange, dataChunk: T[]}> {
-    const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize) + 1;
+    const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize);
     const startItemIndex = Math.floor(viewportChange.scrollOffset / this.itemSize);
     let result: Observable<T[]>;
     if (
