@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {ITzTableColumn} from './tz-table/tz-table-column.interface';
 import {TQueryFuncCallback} from './tz-table/tz-table.component';
 import {TzTransactionService} from './tz-transaction.service';
@@ -17,7 +17,8 @@ export interface ITzTransacton {
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   title = 'angular-tz-list';

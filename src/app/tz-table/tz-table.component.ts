@@ -18,7 +18,6 @@ export type TQueryFuncCallback<T> = (params: {
   providers: [{provide: VIRTUAL_SCROLL_STRATEGY, useClass: CustomVirtualScrollStrategy}]
 })
 export class TzTableComponent implements OnInit, AfterViewInit {
-  offset: number;
 
   /**
    * Input: rows or query function (data source).
@@ -38,7 +37,8 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   }
 
   constructor(
-    private readonly cdr: ChangeDetectorRef
+    private readonly cdr: ChangeDetectorRef,
+    private readonly window: Window,
   ) {
     this.displayedColumns = [];
     this.columns = [];
@@ -57,7 +57,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   /**
    * Data Source.
    */
-  public dataSource: DataSource<unknown>;
+  public dataSource: DataSourceQuery<unknown>;
 
   /**
    * Virtual scroll viewport instance.
@@ -110,6 +110,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   public ngAfterViewInit(): void {
     this.setupDataSource();
     this.isInitialized = true;
+    this.cdr.detectChanges();
   }
 
   /**
@@ -118,16 +119,16 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   private setupDataSource(): void {
     if (this._rows) {
       if (TzTableComponent.isDataSource(this._rows)) {
-        this.dataSource = this._rows as DataSource<unknown>;
+        this.dataSource = this._rows as DataSourceQuery<unknown>;
       } else {
         this.dataSource = new DataSourceQuery(
           this._rows as TQueryFuncCallback<unknown>,
           this.viewport,
           this.itemSize,
-          this.chunkSize
+          this.chunkSize,
+          this.window.innerHeight
         );
       }
-      this.cdr.markForCheck();
     }
   }
 

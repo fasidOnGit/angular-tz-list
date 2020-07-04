@@ -5,6 +5,7 @@ import {ScrollingModule} from '@angular/cdk/scrolling';
 import {MatTableModule} from '@angular/material/table';
 import {ObserversModule} from '@angular/cdk/observers';
 import {FlexModule} from '@angular/flex-layout';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 @NgModule({
@@ -17,7 +18,14 @@ import {FlexModule} from '@angular/flex-layout';
     ScrollingModule,
     MatTableModule,
     ObserversModule,
-    FlexModule
+    FlexModule,
+    MatProgressSpinnerModule
+  ],
+  providers: [
+    {
+      provide: Window,
+      useValue: window
+    }
   ]
 })
 export class TzTableModule {

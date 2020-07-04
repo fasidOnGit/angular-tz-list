@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ITzTransacton} from './app.component';
-import {map} from 'rxjs/operators';
+import {map, tap} from 'rxjs/operators';
 
 /**
  * Response from transaction.
@@ -14,6 +14,7 @@ export type IRestTransactionResponse = Array<[number, number, number, string, nu
 })
 export class TzTransactionService {
   private static HOST_URL = 'https://api.tzstats.com/tables/op';
+  size = 0;
   constructor(
     private http: HttpClient
   ) {
@@ -39,6 +40,9 @@ export class TzTransactionService {
           });
           return obj;
         });
+      }),
+      tap(val => {
+        this.size += val.length;
       })
     );
   }

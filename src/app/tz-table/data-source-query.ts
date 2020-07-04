@@ -1,9 +1,15 @@
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
-import {BehaviorSubject, EMPTY, Observable, of, Subscription, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, of, Subscription, throwError} from 'rxjs';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {TQueryFuncCallback} from './tz-table.component';
-import {catchError, debounceTime, distinctUntilChanged, map, mergeMap, switchMap, tap} from 'rxjs/operators';
+import {catchError, distinctUntilChanged, map, mergeMap, tap} from 'rxjs/operators';
 
+/**
+ * The remaining number of items to start loading the next chunk.
+ * In other words: when user scrolls down the table and there are 3 or less remaining below
+ * then, start loading the new data chunk.
+ */
+const SCROLLING_LOAD_ITEMS_THRESHOLD = 3;
 
 /**
  * Defines viewport change information.
@@ -68,7 +74,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * Emits loading state.
    */
     // tslint:disable-next-line:variable-name
-  private _loading: BehaviorSubject<boolean>;
+  private readonly _loading: BehaviorSubject<boolean>;
 
   /**
    * Observable on the viewport change.
@@ -81,19 +87,21 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @param viewport Virtual viewport.
    * @param itemSize row height.
    * @param dataChunkSize limit.
+   * @param minViewPortHeight Initial viewport height.
    */
   constructor(
     private readonly queryFunc: TQueryFuncCallback<T>,
     private viewport: CdkVirtualScrollViewport,
     private readonly itemSize: number,
-    private readonly dataChunkSize: number
+    private readonly dataChunkSize: number,
+    minViewPortHeight: number
   ) {
     super();
     this.allData = [];
     this.visibleData = new BehaviorSubject<T[]>([]);
     this.loadMoreData = true;
     this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: window.innerHeight});
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
     this.viewport.elementScrolled().subscribe((evt: Event) => {
       // tslint:disable-next-line:no-non-null-assertion
       const scrollElem = evt!.currentTarget as Element;
@@ -145,7 +153,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
         }
       }),
       map(dataLoadResult => {
-        const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize);
+        const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize) + 1;
         const startItemIndex = Math.floor(dataLoadResult.viewportChange.scrollOffset / this.itemSize);
         const endItemIndex = startItemIndex + itemsInViewport;
         const slicedData = this.allData.slice(startItemIndex, endItemIndex);
@@ -166,14 +174,13 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @return Chunk data with its appropriate chained viewport change.
    */
   private loadDataChunk(viewportChange: IViewportChange): Observable<{viewportChange: IViewportChange, dataChunk: T[]}> {
-    const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize);
+    const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize) + 1;
     const startItemIndex = Math.floor(viewportChange.scrollOffset / this.itemSize);
     let result: Observable<T[]>;
-    if (this._loading.value || startItemIndex + itemsInViewport + 3 <= this.allData.length || !this.loadMoreData) {
-      result = of([]);
-    } else {
+    if (
+      this.canLoadMore(startItemIndex + itemsInViewport)
+    ) {
       this._loading.next(true);
-      const loadStart = this.allData.length;
       const limit = startItemIndex + itemsInViewport - this.allData.length;
       let chunksToLoad = Math.ceil(limit / this.dataChunkSize);
       if (limit % this.dataChunkSize === 0 || chunksToLoad === 0) {
@@ -199,9 +206,19 @@ export class DataSourceQuery<T> extends DataSource<T> {
           return throwError(err);
         })
       );
+    } else {
+      result = of([]);
     }
     return result.pipe(
       map(dataChunk => ({viewportChange, dataChunk}))
     );
+  }
+
+  /**
+   * Indicator should fetch more data.
+   * @param endItemIndex End item index.
+   */
+  public canLoadMore(endItemIndex: number): boolean {
+    return !this._loading.value && this.loadMoreData && endItemIndex  + SCROLLING_LOAD_ITEMS_THRESHOLD >= this.allData.length;
   }
 }

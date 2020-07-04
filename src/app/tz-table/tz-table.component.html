@@ -6,16 +6,18 @@
   </div>
   <cdk-virtual-scroll-viewport fxFlex>
     <mat-table [dataSource]="dataSource">
-      <!--    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" [style.top.px]="offset"></mat-header-row>-->
-      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      <mat-row [style.height.px]="itemSize" *matRowDef="let row; columns: displayedColumns"></mat-row>
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
-        <mat-header-cell *matHeaderCellDef [style.top.px]="offset">
-          <span>{{column.label}}</span>
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element">
+        <mat-cell *matCellDef="let element" fxFlex>
           <span>{{element[column.property]}}</span>
         </mat-cell>
       </ng-container>
+      <ng-container matColumnDef="disclaimer">
+        <mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length" fxFlex fxLayoutAlign="center center">
+          <mat-spinner [diameter]="30"></mat-spinner>
+        </mat-footer-cell>
+      </ng-container>
+      <mat-footer-row *matFooterRowDef="(dataSource?.loading | async) ? ['disclaimer'] : []"></mat-footer-row>
     </mat-table>
   </cdk-virtual-scroll-viewport>
 </div>

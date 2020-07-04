@@ -21,7 +21,9 @@ import {HttpClientModule} from '@angular/common/http';
     HttpClientModule,
     FlexModule
   ],
-  providers: [TzTransactionService],
+  providers: [
+    TzTransactionService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
