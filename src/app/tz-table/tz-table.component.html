@@ -1,21 +1,21 @@
-<div class="table-header" fxLayout="row">
+<div fxLayout="column">
+  <div class="table-header" fxLayout="row">
   <span *ngFor="let column of displayedColumns" fxFlex>
     {{column}}
   </span>
+  </div>
+  <cdk-virtual-scroll-viewport fxFlex>
+    <mat-table [dataSource]="dataSource">
+      <!--    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" [style.top.px]="offset"></mat-header-row>-->
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
+        <mat-header-cell *matHeaderCellDef [style.top.px]="offset">
+          <span>{{column.label}}</span>
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <span>{{element[column.property]}}</span>
+        </mat-cell>
+      </ng-container>
+    </mat-table>
+  </cdk-virtual-scroll-viewport>
 </div>
-<cdk-virtual-scroll-viewport [itemSize]="itemSize"
-                             (scrolledIndexChange)="offset = viewport.getOffsetToRenderedContentStart() * -1"
-                             [style.height.px]="(itemSize * chunkSize) + itemSize">
-  <mat-table [dataSource]="dataSource">
-<!--    <mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" [style.top.px]="offset"></mat-header-row>-->
-    <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-    <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
-      <mat-header-cell *matHeaderCellDef [style.top.px]="offset">
-        <span>{{column.label}}</span>
-      </mat-header-cell>
-      <mat-cell *matCellDef="let element">
-        <span>{{element[column.property]}}</span>
-      </mat-cell>
-    </ng-container>
-  </mat-table>
-</cdk-virtual-scroll-viewport>

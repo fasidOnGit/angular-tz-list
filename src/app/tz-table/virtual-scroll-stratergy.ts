@@ -8,12 +8,12 @@ const ROW_HEIGHT = 50;
 /**
  * Min buffer height in pixels for the data grid.
  */
-const MIN_BUFFER_PX = 250;
+const MIN_BUFFER_PX = 1000;
 
 /**
  * Max buffer height in pixels for the data grid.
  */
-const MAX_BUFFER_PX = 500;
+const MAX_BUFFER_PX = 2000;
 
 /**
  * Virtual Scroll Strategy.

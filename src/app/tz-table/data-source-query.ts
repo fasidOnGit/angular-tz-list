@@ -74,7 +74,6 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * Observable on the viewport change.
    */
   private readonly viewportChange: BehaviorSubject<IViewportChange>;
-  coutner = 0;
 
   /**
    * Ctor.
@@ -94,7 +93,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
     this.visibleData = new BehaviorSubject<T[]>([]);
     this.loadMoreData = true;
     this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: this.itemSize * this.dataChunkSize});
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: window.innerHeight});
     this.viewport.elementScrolled().subscribe((evt: Event) => {
       // tslint:disable-next-line:no-non-null-assertion
       const scrollElem = evt!.currentTarget as Element;
@@ -107,10 +106,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
    */
   public connect(collectionViewer: CollectionViewer): Observable<T[] | ReadonlyArray<T>> {
     this.reset();
-    this.coutner++;
-    if (this.coutner < 9) {
-      this.dataProcessingSubscription = this.createDataPipeline().subscribe();
-    }
+    this.dataProcessingSubscription = this.createDataPipeline().subscribe();
     return this.visibleData;
   }
 
@@ -157,10 +153,10 @@ export class DataSourceQuery<T> extends DataSource<T> {
         const currentOffset = this.itemSize * startItemIndex;
         this.viewport.setRenderedContentOffset(currentOffset);
         this.viewport.setRenderedRange({start: startItemIndex, end: endItemIndex});
-        this.visibleData.next(slicedData);
 
         return slicedData;
-      })
+      }),
+      tap(slicedData => this.visibleData.next(slicedData))
     );
   }
 
@@ -173,11 +169,9 @@ export class DataSourceQuery<T> extends DataSource<T> {
     const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize);
     const startItemIndex = Math.floor(viewportChange.scrollOffset / this.itemSize);
     let result: Observable<T[]>;
-    console.log(startItemIndex + itemsInViewport + 3, this.allData.length);
     if (this._loading.value || startItemIndex + itemsInViewport + 3 <= this.allData.length || !this.loadMoreData) {
       result = of([]);
     } else {
-      console.log(startItemIndex + itemsInViewport + 3, this.allData.length);
       this._loading.next(true);
       const loadStart = this.allData.length;
       const limit = startItemIndex + itemsInViewport - this.allData.length;
