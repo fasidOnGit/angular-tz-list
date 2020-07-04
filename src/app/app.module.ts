@@ -8,6 +8,7 @@ import {MatCardModule} from '@angular/material/card';
 import {FlexModule} from '@angular/flex-layout';
 import {TzTransactionService} from './tz-transaction.service';
 import {HttpClientModule} from '@angular/common/http';
+import {StorageModule} from './store/storage.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import {HttpClientModule} from '@angular/common/http';
     TzTableModule,
     MatCardModule,
     HttpClientModule,
-    FlexModule
+    FlexModule,
+    StorageModule
   ],
   providers: [
     TzTransactionService,
