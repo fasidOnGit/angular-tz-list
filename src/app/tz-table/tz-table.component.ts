@@ -18,6 +18,7 @@ export type TQueryFuncCallback<T> = (params: {
   providers: [{provide: VIRTUAL_SCROLL_STRATEGY, useClass: CustomVirtualScrollStrategy}]
 })
 export class TzTableComponent implements OnInit, AfterViewInit {
+  offset: number;
 
   /**
    * Input: rows or query function (data source).

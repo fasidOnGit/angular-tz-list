@@ -4,6 +4,7 @@ import {TzTableComponent} from './tz-table.component';
 import {ScrollingModule} from '@angular/cdk/scrolling';
 import {MatTableModule} from '@angular/material/table';
 import {ObserversModule} from '@angular/cdk/observers';
+import {FlexModule} from '@angular/flex-layout';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import {ObserversModule} from '@angular/cdk/observers';
     CommonModule,
     ScrollingModule,
     MatTableModule,
-    ObserversModule
+    ObserversModule,
+    FlexModule
   ]
 })
 export class TzTableModule {

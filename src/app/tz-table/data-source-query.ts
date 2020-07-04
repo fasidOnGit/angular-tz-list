@@ -1,8 +1,8 @@
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
-import {BehaviorSubject, EMPTY, Observable, Subscription, throwError} from 'rxjs';
+import {BehaviorSubject, EMPTY, Observable, of, Subscription, throwError} from 'rxjs';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {TQueryFuncCallback} from './tz-table.component';
-import {catchError, debounceTime, distinctUntilChanged, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, debounceTime, distinctUntilChanged, map, mergeMap, switchMap, tap} from 'rxjs/operators';
 
 
 /**
@@ -94,7 +94,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
     this.visibleData = new BehaviorSubject<T[]>([]);
     this.loadMoreData = true;
     this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: this.dataChunkSize * this.itemSize});
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: this.itemSize * this.dataChunkSize});
     this.viewport.elementScrolled().subscribe((evt: Event) => {
       // tslint:disable-next-line:no-non-null-assertion
       const scrollElem = evt!.currentTarget as Element;
@@ -141,7 +141,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
     return this.viewportChange.pipe(
       distinctUntilChanged((a, b) => a.scrollOffset === b.scrollOffset && a.viewportSize === b.viewportSize)
     ).pipe(
-      switchMap(viewportChange => this.loadDataChunk(viewportChange)),
+      mergeMap(viewportChange => this.loadDataChunk(viewportChange)),
       tap(dataLoadResult => {
         if (dataLoadResult.dataChunk) {
           this.allData = this.allData.concat(dataLoadResult.dataChunk);
@@ -173,9 +173,11 @@ export class DataSourceQuery<T> extends DataSource<T> {
     const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize);
     const startItemIndex = Math.floor(viewportChange.scrollOffset / this.itemSize);
     let result: Observable<T[]>;
-    if (startItemIndex + itemsInViewport + 3 <= this.allData.length || !this.loadMoreData) {
-      result = EMPTY;
+    console.log(startItemIndex + itemsInViewport + 3, this.allData.length);
+    if (this._loading.value || startItemIndex + itemsInViewport + 3 <= this.allData.length || !this.loadMoreData) {
+      result = of([]);
     } else {
+      console.log(startItemIndex + itemsInViewport + 3, this.allData.length);
       this._loading.next(true);
       const loadStart = this.allData.length;
       const limit = startItemIndex + itemsInViewport - this.allData.length;
