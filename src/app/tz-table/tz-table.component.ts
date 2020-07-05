@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ContentChildren,
+  Input,
+  OnInit, QueryList,
+  ViewChild
+} from '@angular/core';
 import {Observable} from 'rxjs';
 import {CdkVirtualScrollViewport, VIRTUAL_SCROLL_STRATEGY} from '@angular/cdk/scrolling';
 import {DataSource} from '@angular/cdk/collections';
@@ -7,6 +16,7 @@ import {DataSourceQuery} from './strategy/data-source-query';
 import {CustomVirtualScrollStrategy} from './strategy/virtual-scroll-stratergy';
 import {Store} from '@ngrx/store';
 import TzTableState from '../store/tz-table.state';
+import {TzTableCustomColumnComponent} from './tz-table-custom-column/tz-table-custom-column.component';
 
 export type TQueryFuncCallback<T> = (params: {
   limit: number, cursor: T
@@ -21,6 +31,7 @@ export type TQueryFuncCallback<T> = (params: {
 })
 export class TzTableComponent implements OnInit, AfterViewInit {
 
+  @Input() heading?: {label: string, icon?: string};
   /**
    * Input: rows or query function (data source).
    * We can set up (bind) the following data sources:
@@ -37,6 +48,17 @@ export class TzTableComponent implements OnInit, AfterViewInit {
       this.setupDataSource();
     }
   }
+
+  /**
+   * Custom Column tempalte refs.
+   */
+  @ContentChildren(TzTableCustomColumnComponent)
+  public customColumns!: QueryList<TzTableCustomColumnComponent>;
+
+  /**
+   * Custom template maps.
+   */
+  public customColumnMap = {};
 
   constructor(
     private readonly cdr: ChangeDetectorRef,
@@ -113,6 +135,10 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   public ngAfterViewInit(): void {
     this.setupDataSource();
     this.isInitialized = true;
+    this.customColumnMap = this.customColumns.toArray().reduce((acc, curr) => {
+      acc[curr.title] = curr.template;
+      return acc;
+    }, {});
     this.cdr.detectChanges();
   }
 

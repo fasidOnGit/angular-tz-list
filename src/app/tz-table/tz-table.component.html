@@ -1,4 +1,8 @@
 <div fxLayout="column">
+  <div class="table-heading" *ngIf="heading" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start space-between">
+    <mat-icon [svgIcon]="heading.icon"></mat-icon>
+    <span [attr.aria-label]="heading.label">{{heading.label}}</span>
+  </div>
   <div class="table-header" fxFlex="99%" fxLayout="row">
     <span *ngFor="let column of columns" fxFlex>
       {{column.label}}
@@ -9,7 +13,8 @@
       <mat-row [style.height.px]="itemSize" *matRowDef="let row; columns: displayedColumns"></mat-row>
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
         <mat-cell *matCellDef="let element" fxFlex>
-          <span>{{!column.valueTransformer ? element[column.property]: (element | valueTransformer: column)}}</span>
+          <ng-container [ngTemplateOutletContext]="{column: column, element: element}"
+                        [ngTemplateOutlet]="customColumnMap[column.title] ? customColumnMap[column.title] : cellText"></ng-container>
         </mat-cell>
       </ng-container>
       <ng-container matColumnDef="loading">
@@ -21,3 +26,7 @@
     </mat-table>
   </cdk-virtual-scroll-viewport>
 </div>
+
+<ng-template #cellText let-column="column" let-element="element">
+  <span>{{!column.valueTransformer ? element[column.property]: (element | valueTransformer: column)}}</span>
+</ng-template>

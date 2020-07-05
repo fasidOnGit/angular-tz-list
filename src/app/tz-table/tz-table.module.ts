@@ -7,12 +7,16 @@ import {ObserversModule} from '@angular/cdk/observers';
 import {FlexModule} from '@angular/flex-layout';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { ValueTransformerPipe } from './value-transformer/value-transformer.pipe';
+import { TzTableCustomColumnComponent } from './tz-table-custom-column/tz-table-custom-column.component';
+import {MatIconModule} from '@angular/material/icon';
 
 
 @NgModule({
-  declarations: [TzTableComponent, ValueTransformerPipe],
+  declarations: [TzTableComponent, ValueTransformerPipe, TzTableCustomColumnComponent],
   exports: [
-    TzTableComponent
+    TzTableComponent,
+    TzTableCustomColumnComponent,
+    ValueTransformerPipe
   ],
   imports: [
     CommonModule,
@@ -20,7 +24,8 @@ import { ValueTransformerPipe } from './value-transformer/value-transformer.pipe
     MatTableModule,
     ObserversModule,
     FlexModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatIconModule
   ],
   providers: [
     {

@@ -4,8 +4,17 @@
   </mat-card-header>
   <mat-card-content>
     <app-tz-table fxFlex
+                  [heading]="{label: 'Recent Transaction', icon: 'history'}"
                   [columns]="columns"
                   [rows]="loadDataQuery"
-                  [chunkSize]="10"></app-tz-table>
+                  [chunkSize]="10">
+      <app-tz-table-custom-column title="amount">
+        <ng-template let-element="element" let-column="column">
+          <span>
+            {{element[column.property] | number: '1.1-1'}}&nbsp;XTZ&nbsp;<label [style.color]="'#818d9c'">{{element | valueTransformer: column | number: '1.1-1'}}&nbsp;USD</label>
+          </span>
+        </ng-template>
+      </app-tz-table-custom-column>
+    </app-tz-table>
   </mat-card-content>
 </mat-card>

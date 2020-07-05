@@ -4,7 +4,7 @@ import {ITzTableColumn} from '../tz-table-column.interface';
 /**
  * Value transformer for TzTableComponent.
  * Allows the user to specify a valueTransformer callback as part of column definition.
- * @author Kader Fasid (kader.fasid@gmail.com)
+ * @author Kader Fasid (fasidmpm@gmail.com)
  */
 @Pipe({
   name: 'valueTransformer'

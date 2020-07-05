@@ -6,7 +6,7 @@ import {TzTableEffects} from './effects';
 
 /**
  * Store.
- * @author Kader Fasid (kader.fasid@gmail.com)
+ * @author Kader Fasid (fasidmpm@gmail.com)
  */
 @NgModule({
   imports: [

@@ -2,7 +2,7 @@ import {CollectionViewer, DataSource} from '@angular/cdk/collections';
 import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {TQueryFuncCallback} from '../tz-table.component';
-import {distinctUntilChanged, map, mapTo, tap} from 'rxjs/operators';
+import {distinctUntilChanged, map, mapTo, switchMap, take, tap} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
 import TzTableState from '../../store/tz-table.state';
 import {GetItems, SetItemSize, ViewportChange} from '../../store/actions';
@@ -139,8 +139,24 @@ export class DataSourceQuery<T> extends DataSource<T> {
     this.reset();
     this.dataProcessingSubscription.push(
       this.createDataPipeline().subscribe(),
-      this.store.select(state => state.transaction.allData).subscribe(
-        () => this._loading.next(false)
+      this.store.select(state => state.transaction.allData).pipe(
+        switchMap(() => this.store.select(state => state.transaction).pipe(take(1)))
+      ).subscribe(
+        ({recentChunk}) => {
+          const {
+            itemsInViewport, startItemIndex
+          } = DataSourceQuery.calculateItemsInViewport(recentChunk.viewportChange, this.itemSize);
+          const limit = startItemIndex + itemsInViewport - this.allData.length;
+          let loadedItems: T[] = recentChunk.dataChunk as T[];
+
+          if (!recentChunk.dataChunk) {
+            loadedItems = [];
+          }
+          if (loadedItems.length < limit) {
+            this.loadMoreData = false;
+          }
+          this._loading.next(false);
+        }
       ),
       this.store.select(state => state.transaction.error).subscribe(err => {
         this._loading.next(false);
@@ -151,17 +167,8 @@ export class DataSourceQuery<T> extends DataSource<T> {
       tap(
         ({recentChunk: dataLoadResult, allData}) => {
           const {
-            itemsInViewport, endItemIndex, startItemIndex
+            endItemIndex, startItemIndex
           } = DataSourceQuery.calculateItemsInViewport(dataLoadResult.viewportChange, this.itemSize);
-          const limit = startItemIndex + itemsInViewport - this.allData.length;
-          let loadedItems: T[] = dataLoadResult.dataChunk as T[];
-
-          if (!dataLoadResult.dataChunk) {
-            loadedItems = [];
-          }
-          if (loadedItems.length < limit) {
-            this.loadMoreData = false;
-          }
 
           this.allData = allData;
           this.viewport.setTotalContentSize(this.itemSize * allData.length);

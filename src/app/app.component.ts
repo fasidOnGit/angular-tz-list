@@ -3,6 +3,8 @@ import {ITzTableColumn} from './tz-table/tz-table-column.interface';
 import {TQueryFuncCallback} from './tz-table/tz-table.component';
 import {TzTransactionService} from './tz-transaction.service';
 import {formatDate} from '@angular/common';
+import {MatIconRegistry} from '@angular/material/icon';
+import {DomSanitizer} from '@angular/platform-browser';
 
 /**
  * Model for Transaction.
@@ -27,8 +29,11 @@ export class AppComponent {
   loadDataQuery: TQueryFuncCallback<ITzTransacton>;
 
   constructor(
-    private readonly tzTransactionService: TzTransactionService
+    private readonly tzTransactionService: TzTransactionService,
+    private readonly matIconRegistry: MatIconRegistry,
+    private domeSanitizer: DomSanitizer
   ) {
+    this.matIconRegistry.addSvgIcon('history', domeSanitizer.bypassSecurityTrustResourceUrl('../assets/history.svg'));
     this.columns = [
       {
         title: 'type',
@@ -39,13 +44,16 @@ export class AppComponent {
         title: 'amount',
         label: 'Amount XTZ (USD)',
         property: 'volume',
+        valueTransformer: ((value, property) => {
+          return value[property] * 2.33; // 1 XTZ to USD
+        })
       },
       {
         title: 'date',
         label: 'Date',
         property: 'time',
         valueTransformer: (value, property) => {
-          return formatDate(value[property], 'MMM d y, h::mm', 'en-US');
+          return formatDate(value[property], 'MMM d y, h:mm', 'en-US');
         }
       },
       {
