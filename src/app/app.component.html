@@ -15,6 +15,13 @@
           </span>
         </ng-template>
       </app-tz-table-custom-column>
+      <app-tz-table-custom-column title="type">
+        <ng-template let-element="element" let-column="column">
+          <span [attr.class]="'type ' + element[column.property]">
+            {{element[column.property] | titlecase}}
+          </span>
+        </ng-template>
+      </app-tz-table-custom-column>
     </app-tz-table>
   </mat-card-content>
 </mat-card>

@@ -1,0 +1,11 @@
+.type {
+  padding: 5px;
+  border-radius: 20px;
+  display: inline-block;
+  &.transaction {
+    background: lightgreen;
+  }
+  &.seed_nonce_revelation {
+    background: yellow;
+  }
+}

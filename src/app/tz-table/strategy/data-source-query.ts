@@ -51,38 +51,6 @@ export class DataSourceQuery<T> extends DataSource<T> {
   }
 
   /**
-   * Ctor.
-   * @param queryFunc Query Func.
-   * @param viewport Virtual viewport.
-   * @param itemSize row height.
-   * @param dataChunkSize limit.
-   * @param minViewPortHeight Initial viewport height.
-   * @param store Store.
-   */
-  constructor(
-    private readonly queryFunc: TQueryFuncCallback<T>,
-    private viewport: CdkVirtualScrollViewport,
-    private readonly itemSize: number,
-    private readonly dataChunkSize: number,
-    minViewPortHeight: number,
-    private store: Store<{ transaction: TzTableState }>
-  ) {
-    super();
-    this.dataProcessingSubscription = [];
-    this.store.dispatch(new SetItemSize(this.itemSize));
-    this.allData = [];
-    this.visibleData = new BehaviorSubject<T[]>([]);
-    this.loadMoreData = true;
-    this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
-    this.viewport.elementScrolled().subscribe((evt: Event) => {
-      // tslint:disable-next-line:no-non-null-assertion
-      const scrollElem = evt!.currentTarget as Element;
-      this.viewportChange.next({scrollOffset: scrollElem.scrollTop, viewportSize: this.viewport.getViewportSize()});
-    });
-  }
-
-  /**
    * Currently displayed processed data.
    */
   private readonly visibleData: BehaviorSubject<T[]>;
@@ -114,7 +82,39 @@ export class DataSourceQuery<T> extends DataSource<T> {
   /**
    * Observable on the viewport change.
    */
-  private readonly viewportChange: BehaviorSubject<IViewportChange>;
+  private viewportChange: BehaviorSubject<IViewportChange>;
+
+  /**
+   * Ctor.
+   * @param queryFunc Query Func.
+   * @param viewport Virtual viewport.
+   * @param itemSize row height.
+   * @param dataChunkSize limit.
+   * @param minViewPortHeight Initial viewport height.
+   * @param store Store.
+   */
+  constructor(
+    private readonly queryFunc: TQueryFuncCallback<T>,
+    private viewport: CdkVirtualScrollViewport,
+    private readonly itemSize: number,
+    private readonly dataChunkSize: number,
+    minViewPortHeight: number,
+    private store: Store<{ transaction: TzTableState }>
+  ) {
+    super();
+    this.dataProcessingSubscription = [];
+    this.store.dispatch(new SetItemSize(this.itemSize));
+    this.allData = [];
+    this.visibleData = new BehaviorSubject<T[]>([]);
+    this.loadMoreData = true;
+    this._loading = new BehaviorSubject<boolean>(false);
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
+    this.viewport.elementScrolled().subscribe((evt: Event) => {
+      // tslint:disable-next-line:no-non-null-assertion
+      const scrollElem = evt!.currentTarget as Element;
+      this.viewportChange.next({scrollOffset: scrollElem.scrollTop, viewportSize: this.viewport.getViewportSize()});
+    });
+  }
 
   /**
    * Calcuates items in viewport.
