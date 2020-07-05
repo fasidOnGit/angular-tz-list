@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {Actions, Effect, ofType} from '@ngrx/effects';
-import {ActionsUnion, ActionTypes} from './actions';
-import {catchError, map, mergeMap} from 'rxjs/operators';
-import {EMPTY} from 'rxjs';
+import {ActionsUnion, ActionTypes, LoadFailure, LoadItems} from './actions';
+import {catchError, map, mergeMap, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
 
 @Injectable()
-export class TzTransactionEffects {
+export class TzTableEffects {
   constructor(
     private actions$: Actions<ActionsUnion>
   ) {
@@ -14,12 +14,10 @@ export class TzTransactionEffects {
   @Effect()
   loadTransaction$ = this.actions$.pipe(
     ofType(ActionTypes.LoadItems),
-    mergeMap(({payload: {limit, cursor, queryFunc}}) => {
+    mergeMap(({payload: {limit, cursor, queryFunc, viewportChange}}) => {
       return queryFunc({limit, cursor}).pipe(
-        map(transactions => ({
-          type: ActionTypes.LoadSuccess, payload: transactions
-        })),
-        catchError(() => EMPTY)
+        map(dataChunk => new LoadItems({dataChunk, viewportChange})),
+        catchError((err) => of(new LoadFailure(err))),
       );
     })
   );

@@ -5,6 +5,8 @@ import {DataSource} from '@angular/cdk/collections';
 import {ITzTableColumn} from './tz-table-column.interface';
 import {DataSourceQuery} from './strategy/data-source-query';
 import {CustomVirtualScrollStrategy} from './strategy/virtual-scroll-stratergy';
+import {Store} from '@ngrx/store';
+import TzTableState from '../store/tz-table.state';
 
 export type TQueryFuncCallback<T> = (params: {
   limit: number, cursor: T
@@ -39,6 +41,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   constructor(
     private readonly cdr: ChangeDetectorRef,
     private readonly window: Window,
+    private readonly store: Store<{ transaction: TzTableState }>,
   ) {
     this.displayedColumns = [];
     this.columns = [];
@@ -55,7 +58,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   public displayedColumns: string[];
 
   /**
-   * Data Source.
+   * Data So*urce.
    */
   public dataSource: DataSourceQuery<unknown>;
 
@@ -126,7 +129,8 @@ export class TzTableComponent implements OnInit, AfterViewInit {
           this.viewport,
           this.itemSize,
           this.chunkSize,
-          this.window.innerHeight
+          this.window.innerHeight,
+          this.store
         );
       }
     }

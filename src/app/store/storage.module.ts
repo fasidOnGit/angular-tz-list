@@ -2,7 +2,7 @@ import {NgModule} from '@angular/core';
 import {StoreModule} from '@ngrx/store';
 import {TzTransactionReducer} from './reducers';
 import {EffectsModule} from '@ngrx/effects';
-import {TzTransactionEffects} from './effects';
+import {TzTableEffects} from './effects';
 
 /**
  * Store.
@@ -11,7 +11,7 @@ import {TzTransactionEffects} from './effects';
 @NgModule({
   imports: [
     StoreModule.forRoot({transaction: TzTransactionReducer}),
-    EffectsModule.forRoot([TzTransactionEffects])
+    EffectsModule.forRoot([TzTableEffects])
   ]
 })
 export class StorageModule {

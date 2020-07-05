@@ -1,8 +1,11 @@
 import {CollectionViewer, DataSource} from '@angular/cdk/collections';
-import {BehaviorSubject, Observable, of, Subscription, throwError} from 'rxjs';
+import {BehaviorSubject, Observable, Subscription} from 'rxjs';
 import {CdkVirtualScrollViewport} from '@angular/cdk/scrolling';
 import {TQueryFuncCallback} from '../tz-table.component';
-import {catchError, distinctUntilChanged, map, mergeMap, tap} from 'rxjs/operators';
+import {distinctUntilChanged, map, mapTo, tap} from 'rxjs/operators';
+import {Store} from '@ngrx/store';
+import TzTableState from '../../store/tz-table.state';
+import {GetItems, SetItemSize, ViewportChange} from '../../store/actions';
 
 /**
  * The remaining number of items to start loading the next chunk.
@@ -55,7 +58,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
   /**
    * Keep subscription over data processing pipeline.
    */
-  private dataProcessingSubscription?: Subscription;
+  private dataProcessingSubscription: Subscription[];
 
 
   /**
@@ -88,15 +91,19 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @param itemSize row height.
    * @param dataChunkSize limit.
    * @param minViewPortHeight Initial viewport height.
+   * @param store Store.
    */
   constructor(
     private readonly queryFunc: TQueryFuncCallback<T>,
     private viewport: CdkVirtualScrollViewport,
     private readonly itemSize: number,
     private readonly dataChunkSize: number,
-    minViewPortHeight: number
+    minViewPortHeight: number,
+    private store: Store<{ transaction: TzTableState }>
   ) {
     super();
+    this.dataProcessingSubscription = [];
+    this.store.dispatch(new SetItemSize(this.itemSize));
     this.allData = [];
     this.visibleData = new BehaviorSubject<T[]>([]);
     this.loadMoreData = true;
@@ -114,18 +121,50 @@ export class DataSourceQuery<T> extends DataSource<T> {
    */
   public connect(collectionViewer: CollectionViewer): Observable<T[] | ReadonlyArray<T>> {
     this.reset();
-    this.dataProcessingSubscription = this.createDataPipeline().subscribe();
-    return this.visibleData;
+    this.dataProcessingSubscription.push(
+      this.createDataPipeline().subscribe(),
+      this.store.select(state => state.transaction.allData).subscribe(
+        () => this._loading.next(false)
+      ),
+      this.store.select(state => state.transaction.error).subscribe(err => {
+        this._loading.next(false);
+        console.error(err);
+      })
+    );
+    return this.store.select(state => state.transaction).pipe(
+      tap(
+        ({recentChunk: dataLoadResult, allData}) => {
+          const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize);
+          const startItemIndex = Math.floor(dataLoadResult.viewportChange.scrollOffset / this.itemSize);
+          const endItemIndex = startItemIndex + itemsInViewport;
+          const limit = startItemIndex + itemsInViewport - this.allData.length;
+          let loadedItems: T[] = dataLoadResult.dataChunk as T[];
+
+          if (!dataLoadResult.dataChunk) {
+            loadedItems = [];
+          }
+          if (loadedItems.length < limit) {
+            this.loadMoreData = false;
+          }
+
+          this.allData = allData;
+          this.viewport.setTotalContentSize(this.itemSize * allData.length);
+
+          const currentOffset = this.itemSize * startItemIndex;
+          this.viewport.setRenderedContentOffset(currentOffset);
+          this.viewport.setRenderedRange({start: startItemIndex, end: endItemIndex});
+        }
+      ),
+      map(({visibleData}) => visibleData)
+    );
   }
 
   /**
    * Gets called when the viewport destroys.
    */
   public disconnect(collectionViewer: CollectionViewer): void {
-    if (this.dataProcessingSubscription) {
-      this.dataProcessingSubscription.unsubscribe();
-      this.dataProcessingSubscription = undefined;
-    }
+    this.dataProcessingSubscription.forEach(x => x.unsubscribe());
+    this.dataProcessingSubscription = [];
   }
   /**
    * Resets data and view.
@@ -141,30 +180,12 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * Sets up the pipeline for data processing.
    * @returns Visible data observable
    */
-  private createDataPipeline(): Observable<T[]> {
+  private createDataPipeline(): Observable<void> {
     return this.viewportChange.pipe(
       distinctUntilChanged((a, b) => a.scrollOffset === b.scrollOffset && a.viewportSize === b.viewportSize)
     ).pipe(
-      mergeMap(viewportChange => this.loadDataChunk(viewportChange)),
-      tap(dataLoadResult => {
-        if (dataLoadResult.dataChunk) {
-          this.allData = this.allData.concat(dataLoadResult.dataChunk);
-          this.viewport.setTotalContentSize(this.itemSize * this.allData.length);
-        }
-      }),
-      map(dataLoadResult => {
-        const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize);
-        const startItemIndex = Math.floor(dataLoadResult.viewportChange.scrollOffset / this.itemSize);
-        const endItemIndex = startItemIndex + itemsInViewport;
-        const slicedData = this.allData.slice(startItemIndex, endItemIndex);
-
-        const currentOffset = this.itemSize * startItemIndex;
-        this.viewport.setRenderedContentOffset(currentOffset);
-        this.viewport.setRenderedRange({start: startItemIndex, end: endItemIndex});
-
-        return slicedData;
-      }),
-      tap(slicedData => this.visibleData.next(slicedData))
+      tap(viewportChange => this.dispatchLoadActions(viewportChange)),
+      mapTo(undefined)
     );
   }
 
@@ -173,10 +194,9 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @param viewportChange Viewport change info.
    * @return Chunk data with its appropriate chained viewport change.
    */
-  private loadDataChunk(viewportChange: IViewportChange): Observable<{viewportChange: IViewportChange, dataChunk: T[]}> {
+  private dispatchLoadActions(viewportChange: IViewportChange): void {
     const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize);
     const startItemIndex = Math.floor(viewportChange.scrollOffset / this.itemSize);
-    let result: Observable<T[]>;
     if (
       this.canLoadMore(startItemIndex + itemsInViewport)
     ) {
@@ -186,32 +206,19 @@ export class DataSourceQuery<T> extends DataSource<T> {
       if (limit % this.dataChunkSize === 0 || chunksToLoad === 0) {
         chunksToLoad++;
       }
-      result = this.queryFunc(
-        {limit: chunksToLoad * this.dataChunkSize, cursor: this.allData[this.allData.length - 1]}
-      ).pipe(
-        map(data => {
-          let loadedItems: T[] = data as T[];
-
-          if (!data) {
-            loadedItems = [];
+      this.store.dispatch(
+        new GetItems<T>(
+          {
+            limit: chunksToLoad * this.dataChunkSize,
+            cursor: this.allData[this.allData.length - 1],
+            queryFunc: this.queryFunc,
+            viewportChange
           }
-          if (loadedItems.length < limit) {
-            this.loadMoreData = false;
-          }
-          this._loading.next(false);
-          return loadedItems;
-        }),
-        catchError(err => {
-          this._loading.next(false);
-          return throwError(err);
-        })
+        )
       );
     } else {
-      result = of([]);
+      this.store.dispatch(new ViewportChange(viewportChange));
     }
-    return result.pipe(
-      map(dataChunk => ({viewportChange, dataChunk}))
-    );
   }
 
   /**
