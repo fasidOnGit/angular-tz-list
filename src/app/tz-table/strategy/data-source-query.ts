@@ -51,6 +51,38 @@ export class DataSourceQuery<T> extends DataSource<T> {
   }
 
   /**
+   * Ctor.
+   * @param queryFunc Query Func.
+   * @param viewport Virtual viewport.
+   * @param itemSize row height.
+   * @param dataChunkSize limit.
+   * @param minViewPortHeight Initial viewport height.
+   * @param store Store.
+   */
+  constructor(
+    private readonly queryFunc: TQueryFuncCallback<T>,
+    private viewport: CdkVirtualScrollViewport,
+    private readonly itemSize: number,
+    private readonly dataChunkSize: number,
+    minViewPortHeight: number,
+    private store: Store<{ transaction: TzTableState }>
+  ) {
+    super();
+    this.dataProcessingSubscription = [];
+    this.store.dispatch(new SetItemSize(this.itemSize));
+    this.allData = [];
+    this.visibleData = new BehaviorSubject<T[]>([]);
+    this.loadMoreData = true;
+    this._loading = new BehaviorSubject<boolean>(false);
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
+    this.viewport.elementScrolled().subscribe((evt: Event) => {
+      // tslint:disable-next-line:no-non-null-assertion
+      const scrollElem = evt!.currentTarget as Element;
+      this.viewportChange.next({scrollOffset: scrollElem.scrollTop, viewportSize: this.viewport.getViewportSize()});
+    });
+  }
+
+  /**
    * Currently displayed processed data.
    */
   private readonly visibleData: BehaviorSubject<T[]>;
@@ -85,35 +117,19 @@ export class DataSourceQuery<T> extends DataSource<T> {
   private readonly viewportChange: BehaviorSubject<IViewportChange>;
 
   /**
-   * Ctor.
-   * @param queryFunc Query Func.
-   * @param viewport Virtual viewport.
-   * @param itemSize row height.
-   * @param dataChunkSize limit.
-   * @param minViewPortHeight Initial viewport height.
-   * @param store Store.
+   * Calcuates items in viewport.
+   * @param viewportChange Viewport change
+   * @param itemSize size of each item in table.
    */
-  constructor(
-    private readonly queryFunc: TQueryFuncCallback<T>,
-    private viewport: CdkVirtualScrollViewport,
-    private readonly itemSize: number,
-    private readonly dataChunkSize: number,
-    minViewPortHeight: number,
-    private store: Store<{ transaction: TzTableState }>
-  ) {
-    super();
-    this.dataProcessingSubscription = [];
-    this.store.dispatch(new SetItemSize(this.itemSize));
-    this.allData = [];
-    this.visibleData = new BehaviorSubject<T[]>([]);
-    this.loadMoreData = true;
-    this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
-    this.viewport.elementScrolled().subscribe((evt: Event) => {
-      // tslint:disable-next-line:no-non-null-assertion
-      const scrollElem = evt!.currentTarget as Element;
-      this.viewportChange.next({scrollOffset: scrollElem.scrollTop, viewportSize: this.viewport.getViewportSize()});
-    });
+  public static calculateItemsInViewport(viewportChange: IViewportChange, itemSize: number): {
+    itemsInViewport: number, startItemIndex: number, endItemIndex: number
+  } {
+    const itemsInViewport =  Math.floor(viewportChange.viewportSize / itemSize);
+    const startItemIndex = Math.floor(viewportChange.scrollOffset / itemSize);
+    return {
+      itemsInViewport, startItemIndex,
+      endItemIndex: itemsInViewport + startItemIndex
+    };
   }
 
   /**
@@ -134,9 +150,9 @@ export class DataSourceQuery<T> extends DataSource<T> {
     return this.store.select(state => state.transaction).pipe(
       tap(
         ({recentChunk: dataLoadResult, allData}) => {
-          const itemsInViewport = Math.floor(dataLoadResult.viewportChange.viewportSize / this.itemSize);
-          const startItemIndex = Math.floor(dataLoadResult.viewportChange.scrollOffset / this.itemSize);
-          const endItemIndex = startItemIndex + itemsInViewport;
+          const {
+            itemsInViewport, endItemIndex, startItemIndex
+          } = DataSourceQuery.calculateItemsInViewport(dataLoadResult.viewportChange, this.itemSize);
           const limit = startItemIndex + itemsInViewport - this.allData.length;
           let loadedItems: T[] = dataLoadResult.dataChunk as T[];
 
@@ -195,8 +211,9 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @return Chunk data with its appropriate chained viewport change.
    */
   private dispatchLoadActions(viewportChange: IViewportChange): void {
-    const itemsInViewport = Math.floor(viewportChange.viewportSize / this.itemSize);
-    const startItemIndex = Math.floor(viewportChange.scrollOffset / this.itemSize);
+    const {
+      itemsInViewport, startItemIndex
+    } = DataSourceQuery.calculateItemsInViewport(viewportChange, this.itemSize);
     if (
       this.canLoadMore(startItemIndex + itemsInViewport)
     ) {
