@@ -2,19 +2,16 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {ITzTransacton} from './app.component';
-import {map, tap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 
 /**
  * Response from transaction.
  */
-export type IRestTransactionResponse = Array<[number, number, number, string, number]>;
-
 @Injectable({
   providedIn: 'root'
 })
 export class TzTransactionService {
   private static HOST_URL = 'https://api.tzstats.com/tables/op';
-  size = 0;
   constructor(
     private http: HttpClient
   ) {
@@ -31,7 +28,7 @@ export class TzTransactionService {
       fromObject['cursor.lte'] = cursor;
     }
     const params = new HttpParams({fromObject});
-    return this.http.get<IRestTransactionResponse>(TzTransactionService.HOST_URL, {params}).pipe(
+    return this.http.get<any[]>(TzTransactionService.HOST_URL, {params}).pipe(
       map(data => {
         return data.map((each) => {
           const obj = {} as ITzTransacton;
@@ -40,9 +37,6 @@ export class TzTransactionService {
           });
           return obj;
         });
-      }),
-      tap(val => {
-        this.size += val.length;
       })
     );
   }

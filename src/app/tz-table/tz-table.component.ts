@@ -31,7 +31,8 @@ export type TQueryFuncCallback<T> = (params: {
 })
 export class TzTableComponent implements OnInit, AfterViewInit {
 
-  @Input() heading?: {label: string, icon?: string};
+  @Input() heading?: { label: string, icon?: string };
+
   /**
    * Input: rows or query function (data source).
    * We can set up (bind) the following data sources:
@@ -42,6 +43,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   public get rows(): TQueryFuncCallback<unknown> | DataSource<unknown> {
     return this._rows;
   }
+
   public set rows(value: TQueryFuncCallback<unknown> | DataSource<unknown>) {
     this._rows = value;
     if (this.isInitialized) {
@@ -60,17 +62,6 @@ export class TzTableComponent implements OnInit, AfterViewInit {
    */
   public customColumnMap = {};
 
-  constructor(
-    private readonly cdr: ChangeDetectorRef,
-    private readonly window: Window,
-    private readonly store: Store<{ transaction: TzTableState }>,
-  ) {
-    this.displayedColumns = [];
-    this.columns = [];
-    this.chunkSize = 10;
-    this.isInitialized = false;
-    this.itemSize = 50;
-  }
   @Input()
   public columns: ITzTableColumn[];
 
@@ -110,6 +101,17 @@ export class TzTableComponent implements OnInit, AfterViewInit {
    */
   private isInitialized: boolean;
 
+  constructor(
+    private readonly cdr: ChangeDetectorRef,
+    private readonly window: Window,
+    private readonly store: Store<{ transaction: TzTableState }>,
+  ) {
+    this.displayedColumns = [];
+    this.columns = [];
+    this.chunkSize = 10;
+    this.isInitialized = false;
+    this.itemSize = 50;
+  }
 
   /**
    * Type guard for data source objects.
