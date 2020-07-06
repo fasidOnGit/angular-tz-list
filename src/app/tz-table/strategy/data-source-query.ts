@@ -227,7 +227,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
       this._loading.next(true);
       const limit = startItemIndex + itemsInViewport - this.allData.length;
       let chunksToLoad = Math.ceil(limit / this.dataChunkSize);
-      if (limit % this.dataChunkSize === 0 || chunksToLoad === 0) {
+      if ((limit % this.dataChunkSize === 0 || chunksToLoad === 0) && chunksToLoad !== 1) {
         chunksToLoad++;
       }
       this.store.dispatch(
