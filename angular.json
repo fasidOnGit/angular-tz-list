@@ -34,6 +34,14 @@
             "scripts": []
           },
           "configurations": {
+            "mock": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.mock.ts"
+                }
+              ]
+            },
             "production": {
               "fileReplacements": [
                 {
@@ -72,6 +80,9 @@
           "configurations": {
             "production": {
               "browserTarget": "angular-tz-list:build:production"
+            },
+            "mock": {
+              "browserTarget": "angular-tz-list:build:mock"
             }
           }
         },
@@ -116,11 +127,14 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "angular-tz-list:serve"
+            "devServerTarget": "angular-tz-list:serve:mock"
           },
           "configurations": {
             "production": {
               "devServerTarget": "angular-tz-list:serve:production"
+            },
+            "mock": {
+              "devServerTarget": "angular-tz-list:serve:mock"
             }
           }
         }

@@ -28,6 +28,7 @@ export class TzTransactionService {
       fromObject['cursor.lte'] = cursor;
     }
     const params = new HttpParams({fromObject});
+    console.log(params);
     return this.http.get<any[]>(TzTransactionService.HOST_URL, {params}).pipe(
       map(data => {
         return data.map((each) => {

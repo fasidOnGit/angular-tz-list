@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --port=9597",
+    "start": "ng serve",
     "build": "ng build",
     "test": "ng test --watch=false",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e --port=9597 --configuration=mock",
+    "start:mock": "ng serve --configuration=mock"
   },
   "private": true,
   "dependencies": {

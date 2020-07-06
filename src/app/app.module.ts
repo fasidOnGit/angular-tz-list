@@ -7,9 +7,18 @@ import {TzTableModule} from './tz-table/tz-table.module';
 import {MatCardModule} from '@angular/material/card';
 import {FlexModule} from '@angular/flex-layout';
 import {TzTransactionService} from './tz-transaction.service';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {StorageModule} from './store/storage.module';
-
+import {HttpMockRequestInterceptor} from './mock/http-mock-request.interceptor';
+import {environment} from '../environments/environment';
+const interceptors = [];
+if (environment.mock) {
+  interceptors.push({
+    provide: HTTP_INTERCEPTORS,
+      useClass: HttpMockRequestInterceptor,
+    multi: true
+  });
+}
 @NgModule({
   declarations: [
     AppComponent
@@ -25,6 +34,7 @@ import {StorageModule} from './store/storage.module';
   ],
   providers: [
     TzTransactionService,
+    ...interceptors
   ],
   bootstrap: [AppComponent]
 })

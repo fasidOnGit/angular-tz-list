@@ -157,7 +157,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
           this.viewport,
           this.itemSize,
           this.chunkSize,
-          this.window.innerHeight,
+          this.itemSize * this.chunkSize,
           this.store
         );
       }
