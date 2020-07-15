@@ -3,9 +3,16 @@
   border-radius: 20px;
   display: inline-block;
   &.transaction {
-    background: lightgreen;
+    background: #d3f2e5;
   }
   &.seed_nonce_revelation {
     background: yellow;
+  }
+}
+.wrapper {
+  padding: 50px;
+  h3 {
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
   }
 }

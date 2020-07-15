@@ -1,6 +1,6 @@
 <div fxLayout="column">
   <div class="table-heading" *ngIf="heading" fxLayout="row" fxLayoutGap="10px" fxLayoutAlign="start space-between">
-    <mat-icon [svgIcon]="heading.icon"></mat-icon>
+    <mat-icon>{{heading.icon}}</mat-icon>
     <span [attr.aria-label]="heading.label">{{heading.label}}</span>
   </div>
   <div class="table-header" fxFlex="99%" fxLayout="row">
@@ -17,12 +17,6 @@
                         [ngTemplateOutlet]="customColumnMap[column.title] ? customColumnMap[column.title] : cellText"></ng-container>
         </mat-cell>
       </ng-container>
-      <ng-container matColumnDef="loading">
-        <mat-footer-cell *matFooterCellDef [attr.colspan]="displayedColumns.length" fxFlex fxLayoutAlign="center center">
-          <mat-spinner [diameter]="30"></mat-spinner>
-        </mat-footer-cell>
-      </ng-container>
-      <mat-footer-row *matFooterRowDef="(dataSource?.loading | async) ? ['loading'] : []"></mat-footer-row>
     </mat-table>
   </cdk-virtual-scroll-viewport>
 </div>

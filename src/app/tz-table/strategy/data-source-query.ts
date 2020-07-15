@@ -8,13 +8,6 @@ import TzTableState from '../../store/tz-table.state';
 import {GetItems, SetItemSize, ViewportChange} from '../../store/actions';
 
 /**
- * The remaining number of items to start loading the next chunk.
- * In other words: when user scrolls down the table and there are 3 or less remaining below
- * then, start loading the new data chunk.
- */
-const SCROLLING_LOAD_ITEMS_THRESHOLD = 3;
-
-/**
  * Defines viewport change information.
  */
 export interface IViewportChange {
@@ -108,7 +101,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
     this.visibleData = new BehaviorSubject<T[]>([]);
     this.loadMoreData = true;
     this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight + itemSize});
     this.viewport.elementScrolled().subscribe((evt: Event) => {
       // tslint:disable-next-line:no-non-null-assertion
       const scrollElem = evt!.currentTarget as Element;
@@ -250,6 +243,6 @@ export class DataSourceQuery<T> extends DataSource<T> {
    * @param endItemIndex End item index.
    */
   public canLoadMore(endItemIndex: number): boolean {
-    return !this._loading.value && this.loadMoreData && endItemIndex  + SCROLLING_LOAD_ITEMS_THRESHOLD >= this.allData.length;
+    return !this._loading.value && this.loadMoreData && endItemIndex >= this.allData.length;
   }
 }

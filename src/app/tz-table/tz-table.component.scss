@@ -1,8 +1,10 @@
+$border-color: rgba(0, 0, 0, 0.14);
+$heading-background: #f8f9fa;
 :host {
   display: block;
   width: 100%;
   height: 100%;
-  border: 1px solid rgba(0,0,0,0.87);
+  border: 1px solid $border-color;
   border-top: none;
 }
 
@@ -17,9 +19,9 @@ mat-table {
 }
 
 .table-header {
-  background: whitesmoke;
+  background: $heading-background;
   padding: 1.2em;
-  color: #818d9c;
+  color: #818897;
   span {
     &:last-child {
       padding-right: 24px;
@@ -31,6 +33,6 @@ mat-table {
 }
 
 .table-heading {
-  border-top: 1px solid rgba(0,0,0,0.87);
+  border-top: 1px solid $border-color;
   padding: 10px;
 }
