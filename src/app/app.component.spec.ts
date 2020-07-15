@@ -30,18 +30,6 @@ describe('AppComponent', () => {
             getTransaction: jasmine.createSpy().and.returnValue(hot('^--(a|)', {a: tzTransaction}))
           })
         },
-        {
-          provide: MatIconRegistry,
-          useFactory: () => ({
-            addSvgIcon: jasmine.createSpy()
-          })
-        },
-        {
-          provide: DomSanitizer,
-          useFactory: () => ({
-            bypassSecurityTrustResourceUrl: jasmine.createSpy().and.returnValue('fakeUrl')
-          })
-        }
       ]
     }).compileComponents();
     fixture = TestBed.createComponent(AppComponent);
@@ -49,7 +37,6 @@ describe('AppComponent', () => {
   }));
 
   it('should create the app', () => {
-    expect(component['matIconRegistry'].addSvgIcon).toHaveBeenCalledWith('history', 'fakeUrl');
     expect(component.columns).toEqual([
       {
         title: 'type',
@@ -58,7 +45,7 @@ describe('AppComponent', () => {
       },
       {
         title: 'amount',
-        label: 'Amount XTZ (USD)',
+        label: 'Amount XTZ ( USD )',
         property: 'volume',
         valueTransformer: jasmine.any(Function)
       },

@@ -15,12 +15,12 @@ describe('TzTable', () => {
   it('should load 10 rows on load', async () => {
     page.navigateTo();
     browser.sleep(2000);
-    expect(page.getRowCount()).toEqual(10);
+    expect(page.getRowCount()).toEqual(11);
   });
 
   it('should display table column headers', async () => {
     page.navigateTo();
-    const column = ['Type', 'Amount XTZ (USD)', 'Date', 'Address'];
+    const column = ['Type', 'Amount XTZ ( USD )', 'Date', 'Address'];
     for (let i = 0; i < column.length; i++) {
        expect(await page.getColumnHeader().get(i).getText()).toEqual(column[i]);
      }
