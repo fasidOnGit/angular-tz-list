@@ -33,7 +33,8 @@ export class AppComponent {
       {
         title: 'type',
         label: 'Type',
-        property: 'type'
+        property: 'type',
+        flexWidth: 20
       },
       {
         title: 'amount',
@@ -41,7 +42,8 @@ export class AppComponent {
         property: 'volume',
         valueTransformer: ((value, property) => {
           return value[property] * 2.33; // 1 XTZ to USD
-        })
+        }),
+        flexWidth: 35
       },
       {
         title: 'date',

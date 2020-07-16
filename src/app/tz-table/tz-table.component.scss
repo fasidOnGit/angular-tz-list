@@ -1,4 +1,4 @@
-$border-color: rgba(0, 0, 0, 0.14);
+$border-color: #f0f0f0;
 $heading-background: #f8f9fa;
 :host {
   display: block;
@@ -11,17 +11,24 @@ $heading-background: #f8f9fa;
 cdk-virtual-scroll-viewport {
   height: 100%;
   width: 100%;
-  min-height: 500px;
+  min-height: 550px;
 }
 
 mat-table {
   width: 100%;
+  mat-row {
+    border: none;
+  }
+  mat-cell {
+    word-break: break-word;
+  }
 }
 
 .table-header {
   background: $heading-background;
-  padding: 1.2em;
   color: #818897;
+  min-height: 48px;
+  padding-right: 15px;
   span {
     &:last-child {
       padding-right: 24px;

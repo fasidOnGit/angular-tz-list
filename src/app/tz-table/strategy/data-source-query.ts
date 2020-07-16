@@ -101,7 +101,7 @@ export class DataSourceQuery<T> extends DataSource<T> {
     this.visibleData = new BehaviorSubject<T[]>([]);
     this.loadMoreData = true;
     this._loading = new BehaviorSubject<boolean>(false);
-    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight + itemSize});
+    this.viewportChange = new BehaviorSubject<IViewportChange>({scrollOffset: 0, viewportSize: minViewPortHeight});
     this.viewport.elementScrolled().subscribe((evt: Event) => {
       // tslint:disable-next-line:no-non-null-assertion
       const scrollElem = evt!.currentTarget as Element;
@@ -165,7 +165,6 @@ export class DataSourceQuery<T> extends DataSource<T> {
 
           this.allData = allData;
           this.viewport.setTotalContentSize(this.itemSize * allData.length);
-
           const currentOffset = this.itemSize * startItemIndex;
           this.viewport.setRenderedContentOffset(currentOffset);
           this.viewport.setRenderedRange({start: startItemIndex, end: endItemIndex});

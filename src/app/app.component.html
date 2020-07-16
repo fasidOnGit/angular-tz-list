@@ -1,24 +1,25 @@
-<div class="wrapper" fxLayout="column">
-  <h3>TzStats Transaction List</h3>
-  <app-tz-table fxFlex
-                [heading]="{label: 'Recent Transactions', icon: 'history'}"
-                [columns]="columns"
-                [rows]="loadDataQuery"
-                [chunkSize]="10">
-    <app-tz-table-custom-column title="amount">
-      <ng-template let-element="element" let-column="column">
-          <span>
-            {{element[column.property] | number: '1.1-1'}}&nbsp;XTZ&nbsp;<label [style.color]="'#818d9c'">{{element | valueTransformer: column | number: '1.1-1'}}&nbsp;USD</label>
-          </span>
-      </ng-template>
-    </app-tz-table-custom-column>
-    <app-tz-table-custom-column title="type">
-      <ng-template let-element="element" let-column="column">
-          <span [attr.class]="'type ' + element[column.property]">
-            {{element[column.property] | titlecase}}
-          </span>
-      </ng-template>
-    </app-tz-table-custom-column>
-  </app-tz-table>
-
+<div fxFlex fxLayout="row" fxLayoutAlign="center center">
+  <div class="wrapper" fxLayout="column" fxFlex="60%" fxLayoutAlign="center center">
+    <h3>TzStats Transaction List</h3>
+    <app-tz-table [heading]="{label: 'Recent Transactions', icon: 'history'}"
+                  [columns]="columns"
+                  [rows]="loadDataQuery"
+                  [itemSize]="50"
+                  [chunkSize]="10">
+      <app-tz-table-custom-column title="amount">
+        <ng-template let-element="element" let-column="column">
+        <span>
+          {{element[column.property] | number: '1.1-1'}}&nbsp;XTZ&nbsp;<label [style.color]="'#818d9c'">{{element | valueTransformer: column | number: '1.1-1'}}&nbsp;USD</label>
+        </span>
+        </ng-template>
+      </app-tz-table-custom-column>
+      <app-tz-table-custom-column title="type">
+        <ng-template let-element="element" let-column="column">
+        <span [attr.class]="'type ' + element[column.property]">
+          {{element[column.property] | titlecase}}
+        </span>
+        </ng-template>
+      </app-tz-table-custom-column>
+    </app-tz-table>
+  </div>
 </div>

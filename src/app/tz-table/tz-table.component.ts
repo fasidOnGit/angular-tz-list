@@ -3,8 +3,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ContentChildren,
-  Input,
+  ContentChildren, Input,
   OnInit, QueryList,
   ViewChild
 } from '@angular/core';
@@ -89,6 +88,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
   /**
    * Each item size.
    */
+  @Input()
   public itemSize: number;
   /**
    * Rows instance.
@@ -157,7 +157,7 @@ export class TzTableComponent implements OnInit, AfterViewInit {
           this.viewport,
           this.itemSize,
           this.chunkSize,
-          this.itemSize * this.chunkSize,
+          (this.itemSize * this.chunkSize) + this.itemSize,
           this.store
         );
       }

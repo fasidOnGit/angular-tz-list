@@ -3,16 +3,16 @@
     <mat-icon>{{heading.icon}}</mat-icon>
     <span [attr.aria-label]="heading.label">{{heading.label}}</span>
   </div>
-  <div class="table-header" fxFlex="99%" fxLayout="row">
-    <span *ngFor="let column of columns" fxFlex>
+  <div class="table-header" fxFlex fxLayout="row" fxLayoutAlign="start center">
+    <span *ngFor="let column of columns" [fxFlex]="column.flexWidth || 0">
       {{column.label}}
     </span>
   </div>
-  <cdk-virtual-scroll-viewport fxFlex>
+  <cdk-virtual-scroll-viewport fxFlex [ngStyle]="{'min-height': (itemSize * chunkSize) + itemSize + 'px'}">
     <mat-table [dataSource]="dataSource">
       <mat-row [style.height.px]="itemSize" *matRowDef="let row; columns: displayedColumns"></mat-row>
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
-        <mat-cell *matCellDef="let element" fxFlex>
+        <mat-cell *matCellDef="let element" [fxFlex]="column.flexWidth">
           <ng-container [ngTemplateOutletContext]="{column: column, element: element}"
                         [ngTemplateOutlet]="customColumnMap[column.title] ? customColumnMap[column.title] : cellText"></ng-container>
         </mat-cell>
