@@ -12,7 +12,7 @@
     <mat-table [dataSource]="dataSource">
       <mat-row [style.height.px]="itemSize" *matRowDef="let row; columns: displayedColumns"></mat-row>
       <ng-container *ngFor="let column of columns" [matColumnDef]="column.title">
-        <mat-cell *matCellDef="let element" [fxFlex]="column.flexWidth">
+        <mat-cell *matCellDef="let element" [fxFlex]="column.flexWidth || 0">
           <ng-container [ngTemplateOutletContext]="{column: column, element: element}"
                         [ngTemplateOutlet]="customColumnMap[column.title] ? customColumnMap[column.title] : cellText"></ng-container>
         </mat-cell>
