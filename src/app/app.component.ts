@@ -34,7 +34,6 @@ export class AppComponent {
         title: 'type',
         label: 'Type',
         property: 'type',
-        flexWidth: 20
       },
       {
         title: 'amount',
@@ -43,7 +42,7 @@ export class AppComponent {
         valueTransformer: ((value, property) => {
           return value[property] * 2.33; // 1 XTZ to USD
         }),
-        flexWidth: 35
+        flexWidth: 38
       },
       {
         title: 'date',
@@ -51,7 +50,7 @@ export class AppComponent {
         property: 'time',
         valueTransformer: (value, property) => {
           return formatDate(value[property], 'MMM d y, h:mm', 'en-US');
-        }
+        },
       },
       {
         title: 'address',
@@ -61,7 +60,8 @@ export class AppComponent {
           const val = value[property] as string;
           // Yes, we can do the same with css :after and ellipsis., But hey! I kinda chose this :)
           return `${val.slice(0, 2)}...${val.slice(val.length - 6, val.length - 1)}`;
-        })
+        }),
+        flexWidth: 15
       }
     ];
     this.loadDataQuery = this.loadData();
