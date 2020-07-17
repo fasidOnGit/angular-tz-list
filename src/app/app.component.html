@@ -1,5 +1,5 @@
 <div fxFlex fxLayout="row" fxLayoutAlign="center center">
-  <div class="wrapper" fxLayout="column" fxFlex="40%" fxLayoutAlign="center center">
+  <div class="wrapper" fxLayout="column" fxFlex.lg="45" fxFlex.sm="80" fxFlex.md="60" [fxFlex.xs]="100" fxLayoutAlign="center center">
     <h3>TzStats Transaction List</h3>
     <app-tz-table [heading]="{label: 'Recent Transactions', icon: 'history'}"
                   [columns]="columns"
