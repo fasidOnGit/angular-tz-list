@@ -8,7 +8,8 @@
     "test": "ng test --watch=false --codeCoverage=true",
     "lint": "ng lint",
     "e2e": "ng e2e --port=9597 --configuration=mock",
-    "start:mock": "ng serve --configuration=mock"
+    "start:mock": "ng serve --configuration=mock",
+    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points"
   },
   "private": true,
   "dependencies": {
