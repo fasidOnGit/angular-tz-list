@@ -1,6 +1,6 @@
 # AngularTzList
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.0.1.
+This project is to try out a truly generic table component with Virtual Scrolling stratergy.
 
 ## Development server
 
