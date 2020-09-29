@@ -47,7 +47,8 @@ describe('AppComponent', () => {
         title: 'amount',
         label: 'Amount XTZ ( USD )',
         property: 'volume',
-        valueTransformer: jasmine.any(Function)
+        valueTransformer: jasmine.any(Function),
+        flexWidth: 38
       },
       {
         title: 'date',
@@ -59,7 +60,8 @@ describe('AppComponent', () => {
         title: 'address',
         label: 'Address',
         property: 'sender',
-        valueTransformer: jasmine.any(Function)
+        valueTransformer: jasmine.any(Function),
+        flexWidth: 15
       }
     ]);
   });

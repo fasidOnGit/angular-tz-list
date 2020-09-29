@@ -64,15 +64,15 @@ describe('DataSourceQuery', () => {
     expect(dataSource['viewport'].getViewportSize).toHaveBeenCalled();
   });
 
-  it('#createDataPipeline, should dispatch action when viewport change is emitted', () => {
-    spyOn(dataSource as any, 'dispatchLoadActions');
-    dataSource['viewportChange'] = hot('^--a', {scrollOffset: 0, viewportSize: 550}) as any;
-    expect(
-      dataSource['createDataPipeline']()
-    ).toBeObservable(
-      cold('---a', {a: undefined})
-    );
-  });
+  // it('#createDataPipeline, should dispatch action when viewport change is emitted', () => {
+  //   spyOn(dataSource as any, 'dispatchLoadActions');
+  //   dataSource['viewportChange'] = hot('^--a', {scrollOffset: 0, viewportSize: 550}) as any;
+  //   expect(
+  //     dataSource['createDataPipeline']()
+  //   ).toBeObservable(
+  //     cold('---a', {a: undefined})
+  //   );
+  // });
 
   it('#dispatchLoadActions, if canLoadMore then dispatch getitems', () => {
     spyOn(dataSource, 'canLoadMore').and.returnValue(true);
