@@ -19,7 +19,7 @@ module.exports = function (config) {
     },
     coverageIstanbulReporter: {
       dir: require('path').join(__dirname, './coverage/angular-tz-list'),
-      reports: ['html', 'lcovonly'],
+      reports: ['json', 'html', 'lcovonly'],
       fixWebpackSourcePaths: true
     },
     reporters: ['progress', 'kjhtml'],
