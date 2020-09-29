@@ -5,12 +5,10 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "test": "ng test --watch=false --codeCoverage=true",
+    "test": "ng test --watch=false --codeCoverage=true --browsers=ChromeHeadlessCI",
     "lint": "ng lint",
     "e2e": "ng e2e --port=9597 --configuration=mock",
-    "start:mock": "ng serve --configuration=mock",
-    "README-postinstall": "The chromedriver version must support the chrome version installed via puppeteer. Chromedriver 76.0.3809.68 supports Chrome 76. See https://chromedriver.chromium.org/downloads for version matching.",
-    "postinstall": "webdriver-manager update --standalone false --gecko false --versions.chrome 76.0.3809.68"
+    "start:mock": "ng serve --configuration=mock"
   },
   "private": true,
   "dependencies": {
