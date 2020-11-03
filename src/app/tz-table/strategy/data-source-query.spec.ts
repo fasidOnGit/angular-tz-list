@@ -87,7 +87,7 @@ describe('DataSourceQuery', () => {
     );
   });
 
-  xit('#dispatchLoadActions, if canLoadMore is false then dispatch ViewportChange', () => {
+  it('#dispatchLoadActions, if canLoadMore is false then dispatch ViewportChange', () => {
     spyOn(dataSource, 'canLoadMore').and.returnValue(false);
     spyOn(dataSource['store'], 'dispatch');
     const viewportChange = {scrollOffset: 0, viewportSize: 550};
